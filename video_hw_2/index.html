@@ -1,0 +1,131 @@
+<html>
+
+	<head>
+		<title>Group Photo</title>
+		<link rel="stylesheet" type="text/css" href="style.css"/>
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript">
+			var width = 720;
+			
+			function init() {
+				// These help with cross-browser functionality (shim)
+				window.URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+				// The video element on the page to display the webcam
+				var video = document.getElementById('thevideo');
+
+				// if we have the method
+				if (navigator.getUserMedia) {
+					navigator.getUserMedia({video: true}, function(stream) {
+							video.src = window.URL.createObjectURL(stream) || stream;
+							video.play();
+
+							var canvas = document.getElementById('thecanvas');
+							var context = canvas.getContext('2d');
+
+							setTimeout(function() {
+								context.drawImage(video,0,0);
+								socket.send(canvas.toDataURL());
+								document.getElementById('thecanvas').style.display = "none";
+							}, 1000);
+
+						}, function(error) {alert("Failure " + error.code);});
+				}
+			}
+
+			window.addEventListener('load',init);
+		
+
+		
+		
+
+			var socket = io.connect('https://lmj332.itp.io:5000/');
+			
+			socket.on('connect', function() {
+				console.log("Connected");
+			});
+
+			// // Receive a message
+			// socket.on('message', function(data) {
+			// 	document.getElementById('othercanvas').src = data;
+			// });
+
+			// Global Variable
+			var users = [];
+			    
+			// When a message comes in from the server
+			socket.on('message', function(data, id) {
+				makeIndPic(data, id);
+
+			}); 
+
+			var makeIndPic	= function(data, id) {
+
+                 var foundUser = null;
+                 for (var i = 0; i < users.length; i++) {
+                    if (users[i].id == id) {
+                        console.log("Found Existing User!");
+                        foundUser = users[i];
+                    }                     
+                 }
+                 if (foundUser == null) {
+                    // New user!! Draw their image
+                    createUserImage(data, id);
+                    // Log their data
+                    foundUser = {data: data, id: id}; 
+                    // Add them to the array
+                     users.push(foundUser);
+                     // console.log("Didn't find so adding");
+                }
+
+                // Do something with foundUser's data                
+                // console.log(foundUser.id);
+                // console.log(users);
+			}
+
+			var createUserImage= function(data, id) {
+				var newImg = document.createElement("img");
+				newImg.setAttribute("id", id);
+				newImg.setAttribute("class", "added-image");
+				newImg.src = data;
+				var mainDiv = document.getElementById("myImgs")
+				var height = mainDiv.scrollHeight;
+				console.log("height: " + height);
+				if (height > window.innerHeight) {
+					width = width - (width * 0.1);
+					console.log("width: " + width);
+					makeImgsSml();
+				}
+				
+				newImg.setAttribute("width", width);
+				mainDiv.appendChild(newImg);
+				
+
+			}
+
+
+			var makeImgsSml = function() {
+				// var allImgs = document.getElementsByClassName("added-image");
+				// if (allImgs.length % 4 == 0 ) {
+					// width = width/2;
+					for (j = 0; j < users.length; j++ ) {
+						// console.log(users[j].id);
+						var currentImg = document.getElementById(users[j].id);
+						currentImg.setAttribute("width", width);
+					}
+				// }
+			}
+
+		</script>
+
+
+	</head>
+	<body>
+		<video id="thevideo"></video>
+		<div id="myImgs">
+			<canvas id="thecanvas" width="640" height="480"></canvas>
+			<!-- <img id="othercanvas" width="720" height="480"> -->
+		</div>
+	</body>
+</html>

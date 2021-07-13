@@ -1,0 +1,67 @@
+<html>
+	<head>
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript">
+		
+			var socket = io.connect('http://162.243.90.150:8081/');
+			
+			socket.on('connect', function() {
+				console.log("Connected");
+			});
+
+			// Receive from any event
+			socket.on('chatmessage', function (data) {
+				console.log(data);
+				document.getElementById('messages').innerHTML = "" + data + 
+ + "" + document.getElementById('messages').innerHTML;
+			});
+			
+			var sendmessage = function(message) {
+				console.log("chatmessage: " + message);
+				socket.emit('chatmessage', message);
+			};
+
+	
+			function init() {
+				var canvas = document.getElementById('mycanvas');
+				var context = canvas.getContext('2d'); 
+				context.moveTo(0,0);
+				context.lineTo(200,100);
+				context.stroke();
+
+				canvas.addEventListener('mousemove', function(evt) {
+					console.log(evt);
+					context.lineTo(evt.clientX, evt.clientY);
+					context.stroke();
+
+					var drawingobj = {x:evt.clientX, y:evt.clientY};
+					// this is the same thing as this... 
+					// var drawingobj = new Object();
+					// drawingobj.x = evt.clientX;
+					// drawingobj.y = evt.clientY;
+					socket.emit('mousemove', drawingobj);
+				});
+
+			}
+
+			window.addEventListener('load', init);
+
+			socket.on('mousemove', function(data) {
+				console.log(data);
+			})
+		
+			var socket = io.connect('http://162.243.90.150:8080/');
+			
+			socket.on('connect', function() {
+				console.log("Connected");
+			});
+
+
+	
+		</script>	
+	</head>
+ <body>
+ 	<canvas width="500" height="500" id="mycanvas"></canvas>
+ </body>
+</html>
+	

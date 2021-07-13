@@ -1,0 +1,82 @@
+<html>
+	<head>
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript">
+			var joints = [];
+		
+			var socket = io.connect();
+			
+			socket.on('connect', function() {
+				console.log("Connected");
+			});
+	
+			socket.on('kinect', function (data) {
+				// Format the data as it comes in a way that we can draw in 2D
+				joints[data.position] = {x: (data.x)*canvas.width/2+canvas.width/2,
+									y: (data.y*-1)*canvas.height/2+canvas.height/2};
+			});
+
+			var canvas;
+			var context;
+
+			var color = "rgb("+
+			  Math.floor(Math.random()*128+127)+","+
+			  Math.floor(Math.random()*128+127)+","+
+			  Math.floor(Math.random()*128+127)+")";
+
+			var initcanvas = function() {			
+				canvas = document.getElementById('mycanvas');
+				context = canvas.getContext('2d');	
+
+				setInterval(clearDrawing, 1000/30);
+			};
+			
+			var clearDrawing = function() {
+				context.clearRect(0,0,canvas.width,canvas.height);
+				context.beginPath();
+				context.strokeStyle=color;
+				context.fillStyle=color;
+				context.lineWidth = 5;
+				
+				// Connect the dots
+				var lastJoint = null;
+				for (var i = 0; i < joints.length; i++) {
+					if (joints[i] != null) {
+						if (lastJoint == null) {
+							context.moveTo(joints[i].x,joints[i].y);
+							context.fillText(i,joints[i].x-5,joints[i].y-5);
+						}
+						else {
+							context.lineTo(joints[i].x,joints[i].y);
+							context.fillText(i,joints[i].x-5,joints[i].y-5);
+						}
+						lastJoint = joints[i];
+					}
+				}
+				context.stroke();			
+			}
+			
+			document.addEventListener("DOMContentLoaded", initcanvas, false);
+		</script>
+		<style>
+			body {
+				background-color: #000000;
+			}
+			#canvas_div {
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				width: 854px;
+				margin: 0, auto;
+				z-index: 2;
+			}			
+		</style>		
+	</head>
+	<body>
+		<div id="content_wrapper">
+			<div id="canvas_div">
+				<canvas width="854" height="480" id="mycanvas"></canvas>
+			</div>
+		</div>
+	</body>
+</html>	

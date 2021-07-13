@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+		<meta charset=utf-8 />
+		<title>Mapping Bed-Stuy</title>
+		<link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' type='text/css'>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="libraries/reimg-master/reimg.js"></script>
+		<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+		<script src='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.js'></script>
+		<link href='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.css' rel='stylesheet' />
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<script type="text/javascript" src="js/scripts.js"></script>
+		<script type="text/javascript" src="js/mobiledraw.js"></script>
+	</head>
+	<body onload="initCanvas()">
+		<div id="container">
+			<div id="pageTitle"><h1>Mapping Bed-Stuy</h1></div>
+			<div id="map-container">
+				<div id='map'></div>
+				<div id='maps'></div>
+				<div id="canvas-holder">
+					<canvas id="myCanvas" width="1000" height="600"></canvas>
+				</div>
+			</div>
+			<div id="sidebar">
+				<div id="choices">
+					<button id="viewing" class="choicebuttons" type="button">View</button>
+					<button id="drawing" class="choicebuttons" type="button">Draw</button>
+				</div>
+				<div id="view">
+					<div id="map-images">
+					</div>
+				</div>
+				<div id="draw">
+					<canvas id='color-palette'></canvas>
+					<div id="instructions">Draw your points of interest on the map, enter a name and click submit. </div>
+					<input id="user-name" type="text" name="user-name" placeholder="Name Your Map">
+					<button id='submit-map' type='button' value='submit'>submit</button>
+				</div>
+			</div>
+			<div id="drawing-options">
+			<button id="pen" class="choicebuttons bottombuttons" type="button">Draw with Pen</button>
+			<button id="text" class="choicebuttons bottombuttons" type="button">Add Label</button>
+			<input id="map-label" type="text" class = 'bottombuttons' name="map-label" placeholder="Label Text">
+			</div>
+		</div>
+
+	</body>
+</html>

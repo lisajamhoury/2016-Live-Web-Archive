@@ -1,0 +1,92 @@
+<html>
+	<head>
+		<title>Bowie Tweets</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" 
+		<link href='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.css' rel='stylesheet' />
+		<link href='https://fonts.googleapis.com/css?family=Playfair+Display:400,900,700' rel='stylesheet' type='text/css'>
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<script src='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.js'></script>
+		<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>	
+		<style>
+			body {
+		  		padding:0;
+		  		margin:0;
+		  		height: 100%;
+			}
+			html, #map{
+			  	position: absolute;
+			  	top: 0;
+			  	bottom: 0;
+			  	width: 100%;
+			} 
+			.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+				background: #FFEB3B;
+			}
+			.leaflet-container a.leaflet-popup-close-button {
+				color: #222;
+			}
+			.leaflet-container {
+				font-family: 'Playfair Display', serif;
+			}
+
+			#headertop {
+				color: #FFEB3B;
+    		font-size: 3em;
+    		padding: 0 0 20px 34px;
+    		font-family: 'Playfair Display', serif;
+    		font-weight: 900;
+			}
+
+		</style>
+		<script type="text/javascript">
+			var map;
+		
+			function init() {
+				map = L.map('map').setView([27.346500, 15.401948], 2);
+
+				L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibGlzYWphbWhvdXJ5IiwiYSI6ImNpZzV4NHgzcTRrdHp0d2x2cHRvdjVhY3gifQ.ftTsm2W5PxBCE83mpl0w6Q', {
+					maxZoom: 18,
+					attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+						'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+						'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+					id: 'lisajamhoury.b41bd689'
+				}).addTo(map);
+			}
+
+			window.addEventListener('load', init);
+
+			var myIcon = L.icon({
+				iconUrl: 'assets/lightning2.png',
+				iconSize: [16, 23]
+			});
+
+			function createMarker(tweet) {
+				var marker = L.marker([tweet.lng, tweet.lat], {icon:myIcon}).addTo(map); 
+				marker.bindPopup(tweet.text);
+			}
+		</script>	
+		<script type="text/javascript">	
+			if(io !== undefined) {
+			    var socket = io.connect('http://162.243.90.150:8000/');
+
+			    // This listens on the "twitter-steam" channel and data is 
+			    // received everytime a new tweet is receieved.
+			    socket.on('twitter-stream', function (tweet) {
+			    	createMarker(tweet);
+			    });
+
+			   	socket.on("connected", function(r) {
+			      console.log("connected");
+			      socket.emit("start-tweets");
+			    });
+			  }
+		</script>	
+	</head>
+ <body>
+ 	<div id="headertop" class="leaflet-bottom leaflet-left">Live Bowie Tweets</div>
+ 	<div id="map"></div>
+ </body>
+</html>
+	
